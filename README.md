@@ -53,7 +53,6 @@ The data is `std_msgs::msg::Float32`.
 | **o**     | Log **UAV** pose → `uav_wp.csv` | TF `map → x500_gimbal_0/base_link` | appends `x,y,z`                     |
 | **p**     | Log **UGV** pose → `ugv_wp.csv` | TF `map → x1_asp/base_link`        | 〃                                  |
 | **k**     | Kill motors                     | `/command/disarm`                  |                                     |
-
 ---
 
 ## Dependencies

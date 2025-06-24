@@ -184,8 +184,7 @@ private:
   {
     try
     {
-      geometry_msgs::msg::TransformStamped tf =
-          tf_buffer_.lookupTransform("map", child_frame, tf2::TimePointZero);
+      geometry_msgs::msg::TransformStamped tf = tf_buffer_.lookupTransform("map", child_frame, tf2::TimePointZero);
 
       double x = tf.transform.translation.x;
       double y = tf.transform.translation.y;

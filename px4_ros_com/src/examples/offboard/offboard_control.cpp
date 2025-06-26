@@ -106,7 +106,7 @@ private:
     }
 
     /* (3) 첫 셋포인트 수신 후 10회(≈1 s) 연속 송출 → OFFBOARD 모드 + ARM */
-    if (!armed_ && ++setpoint_counter_ >= 10) {
+    if (!armed_ && ++setpoint_counter_ >= 30) {
       publish_vehicle_command(VehicleCommand::VEHICLE_CMD_DO_SET_MODE, 1, 6);          // OFFBOARD
       publish_vehicle_command(VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM, 1.0); // ARM
       armed_ = true;

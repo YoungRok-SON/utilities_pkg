@@ -106,7 +106,7 @@ private:
     }
 
     /* (3) 첫 셋포인트 수신 후 10회(≈1 s) 연속 송출 → OFFBOARD 모드 + ARM */
-    if (!armed_ && ++setpoint_counter_ >= 30) {
+    if (!armed_ && ++setpoint_counter_ >= 20) {
       publish_vehicle_command(VehicleCommand::VEHICLE_CMD_DO_SET_MODE, 1, 6);          // OFFBOARD
       publish_vehicle_command(VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM, 1.0); // ARM
       armed_ = true;
@@ -124,8 +124,6 @@ private:
     setpoint_.position[2] = msg->pose.position.z;
     setpoint_.yaw         = tf2::getYaw(msg->pose.orientation);
     target_command_ = true;
-    setpoint_counter_ = 0;
-
     RCLCPP_INFO(get_logger(), "Target pose arrived. X: %.2f Y: %.2f Z: %.2f Yaw: %.2f",
                 setpoint_.position[0], setpoint_.position[1], setpoint_.position[2], setpoint_.yaw);
   }
@@ -141,7 +139,6 @@ private:
     setpoint_.yaw         = NAN;
     setpoint_.yawspeed    = msg->angular.z;
     target_command_ = true;
-    setpoint_counter_ = 0;
   }
 
   // ③ Gimbal pitch

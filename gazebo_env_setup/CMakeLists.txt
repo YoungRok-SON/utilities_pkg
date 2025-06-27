@@ -20,11 +20,11 @@ add_executable(pose_tf_broadcaster src/pose_tf_broadcaster.cpp)
 ament_target_dependencies(pose_tf_broadcaster rclcpp geometry_msgs tf2_ros)
 
 add_executable(mission_timer_node src/mission_timer.cpp)
-ament_target_dependencies(mission_timer_node
-  rclcpp tf2_ros geometry_msgs std_msgs)
+ament_target_dependencies(mission_timer_node rclcpp tf2_ros geometry_msgs std_msgs)
 
 install(TARGETS
   pose_tf_broadcaster
+  mission_timer_node
   DESTINATION lib/${PROJECT_NAME}
 )
 

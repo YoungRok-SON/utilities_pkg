@@ -13,7 +13,6 @@ def generate_launch_description():
     # ── 경로 준비 ─────────────────────────────────────────
     env_setup_dir = get_package_share_directory('gazebo_env_setup')
     px4_ros_com_dir = get_package_share_directory('px4_ros_com')
-    rviz_config = os.path.join(env_setup_dir, 'config', 'asp_final_proj.rviz')
     use_sim_time_arg = DeclareLaunchArgument(
     'use_sim_time', default_value='true', description='Use /clock time if true')
 
@@ -28,11 +27,6 @@ def generate_launch_description():
     delayed_nodes = TimerAction(
         period=5.0,      # ⬅︎ 여기서 지연 시간(초) 조정
         actions=[
-            IncludeLaunchDescription(
-                PythonLaunchDescriptionSource(
-                    os.path.join(env_setup_dir, 'launch', 'bridge_and_tf.launch.py')
-                )
-            ),
             Node(
                 package='px4_ros_com',
                 executable='offboard_control',

@@ -1,6 +1,6 @@
 // ✅ offboard_control_node.cpp — TF‑based home‑altitude guard (v2)
 // 위치 제어·속도 제어를 외부 명령에 따라 전환하며 동작
-//   • TF 자료로 홈 고도를 1회 설정 (map → x500_gimbal_0)
+//   • TF 자료로 홈 고도를 1회 설정 (map → base_link)
 //   • 홈+0.5 m 이상 고도에서는 DISARM 거부하고 경고만 출력
 
 #include <px4_msgs/msg/offboard_control_mode.hpp>
@@ -65,7 +65,7 @@ private:
   tf2_ros::Buffer tf_buffer_;
   std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
   const std::string map_frame_ = "map";
-  const std::string uav_frame_ = "x500_gimbal_0";   // ← 필요 시 파라미터화
+  const std::string uav_frame_ = "base_link";   // ← 필요 시 파라미터화
   bool   home_alt_set_ = false;
   double home_altitude_ = 0.0;
 

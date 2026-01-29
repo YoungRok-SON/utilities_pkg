@@ -19,6 +19,9 @@
 #include <string>
 #include <cmath>
 
+// ENU<->NED 및 ROS<->PX4 변환 유틸
+#include "px4_ros_com/frame_transforms.h"
+
 using std::placeholders::_1;
 using namespace px4_msgs::msg;
 
@@ -119,10 +122,22 @@ private:
   void pose_callback(const geometry_msgs::msg::PoseStamped::SharedPtr msg)
   {
     mode_ = ControlMode::POSITION;
-    setpoint_.position[0] = msg->pose.position.x;
-    setpoint_.position[1] = msg->pose.position.y;
-    setpoint_.position[2] = msg->pose.position.z;
-    setpoint_.yaw         = tf2::getYaw(msg->pose.orientation);
+    // 위치: ENU -> NED
+    Eigen::Vector3d p_enu(msg->pose.position.x,
+                          msg->pose.position.y,
+                          msg->pose.position.z);
+    const Eigen::Vector3d p_ned = px4_ros_com::frame_transforms::enu_to_ned_local_frame(p_enu);
+    setpoint_.position[0] = static_cast<float>(p_ned.x());
+    setpoint_.position[1] = static_cast<float>(p_ned.y());
+    setpoint_.position[2] = static_cast<float>(p_ned.z());
+
+    // 자세(yaw): ROS(ENU, baselink) -> PX4(NED, aircraft)
+    const auto &o = msg->pose.orientation;
+    Eigen::Quaterniond q_ros(o.w, o.x, o.y, o.z);
+    const Eigen::Quaterniond q_px4 = px4_ros_com::frame_transforms::ros_to_px4_orientation(q_ros);
+    double roll_ned, pitch_ned, yaw_ned;
+    px4_ros_com::frame_transforms::utils::quaternion::quaternion_to_euler(q_px4, roll_ned, pitch_ned, yaw_ned);
+    setpoint_.yaw = static_cast<float>(yaw_ned);
     target_command_ = true;
     RCLCPP_INFO(get_logger(), "Target pose arrived. X: %.2f Y: %.2f Z: %.2f Yaw: %.2f",
                 setpoint_.position[0], setpoint_.position[1], setpoint_.position[2], setpoint_.yaw);
@@ -133,11 +148,15 @@ private:
   {
     mode_ = ControlMode::VELOCITY;
     setpoint_.position[0] = setpoint_.position[1] = setpoint_.position[2] = NAN;
-    setpoint_.velocity[0] = msg->linear.x;
-    setpoint_.velocity[1] = msg->linear.y;
-    setpoint_.velocity[2] = msg->linear.z;
+    // 속도: ENU -> NED
+    Eigen::Vector3d v_enu(msg->linear.x, msg->linear.y, msg->linear.z);
+    const Eigen::Vector3d v_ned = px4_ros_com::frame_transforms::enu_to_ned_local_frame(v_enu);
+    setpoint_.velocity[0] = static_cast<float>(v_ned.x());
+    setpoint_.velocity[1] = static_cast<float>(v_ned.y());
+    setpoint_.velocity[2] = static_cast<float>(v_ned.z());
     setpoint_.yaw         = NAN;
-    setpoint_.yawspeed    = msg->angular.z;
+    // Yaw rate: ENU(+Z up) -> NED(+Z down) → 부호 반전
+    setpoint_.yawspeed    = -msg->angular.z;
     target_command_ = true;
   }
 

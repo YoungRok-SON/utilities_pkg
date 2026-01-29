@@ -23,6 +23,7 @@ find_package(Eigen3 REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(px4_msgs REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(nav_msgs REQUIRED)
 find_package(sensor_msgs REQUIRED)
 find_package(rclpy REQUIRED)
 find_package(tf2 REQUIRED)
@@ -60,7 +61,12 @@ install(TARGETS debug_vect_advertiser DESTINATION lib/${PROJECT_NAME})
 
 # examples/offboard/offboard_control
 add_executable(offboard_control src/examples/offboard/offboard_control.cpp)
-ament_target_dependencies(offboard_control rclcpp px4_msgs geometry_msgs tf2 tf2_geometry_msgs)
+ament_target_dependencies(offboard_control rclcpp px4_msgs geometry_msgs sensor_msgs Eigen3 tf2 tf2_geometry_msgs)
+target_include_directories(offboard_control PUBLIC
+	$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+	$<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+)
+target_link_libraries(offboard_control frame_transforms)
 install(TARGETS offboard_control DESTINATION lib/${PROJECT_NAME})
 
 # examples/offboard/offboard_control_srv

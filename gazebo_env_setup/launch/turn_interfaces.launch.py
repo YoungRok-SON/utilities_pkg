@@ -30,7 +30,8 @@ def generate_launch_description():
         actions=[
             IncludeLaunchDescription(
                 PythonLaunchDescriptionSource(
-                    os.path.join(env_setup_dir, 'launch', 'bridge_and_tf.launch.py')
+                    # os.path.join(env_setup_dir, 'launch', 'bridge_and_tf.launch.py')
+                    os.path.join(env_setup_dir, 'launch', 'bridge_and_tf_x500_d435i.launch.py')
                 )
             ),
             Node(
@@ -49,5 +50,5 @@ def generate_launch_description():
     return LaunchDescription([
         micro_xrce_agent,
         use_sim_time_arg,
-        delayed_nodes
+        delayed_nodes # 이거 키면 센서 데이터 입력, slam 키면 위치 입력
     ])

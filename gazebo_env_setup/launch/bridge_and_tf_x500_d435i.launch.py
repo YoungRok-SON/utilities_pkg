@@ -12,6 +12,10 @@ def generate_launch_description():
         '/d435i/depth/image@sensor_msgs/msg/Image@gz.msgs.Image',
         '/d435i/depth/camera_info@sensor_msgs/msg/CameraInfo@gz.msgs.CameraInfo',
 
+        # Point cloud emitted directly by the gz depth_camera sensor
+        # (published at <depth topic>/points = /d435i/depth/image/points).
+        '/d435i/depth/image/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked',
+
         '/d435i/imu@sensor_msgs/msg/Imu@gz.msgs.IMU',
     ]
 
@@ -29,6 +33,10 @@ def generate_launch_description():
             # Depth
             ('/d435i/depth/image', '/depth_camera'),
             ('/d435i/depth/camera_info', '/depth_camera/camera_info'),
+
+            # Depth point cloud -> topic ego-planner grid_map subscribes to
+            # (grid_map/cloud is remapped to drone_0_pcl_render_node/depth/points)
+            ('/d435i/depth/image/points', '/drone_0_pcl_render_node/depth/points'),
 
             # IMU
             ('/d435i/imu', '/imu'),

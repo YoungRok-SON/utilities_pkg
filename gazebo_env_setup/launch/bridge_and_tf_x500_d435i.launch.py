@@ -16,6 +16,10 @@ def generate_launch_description():
         # (published at <depth topic>/points = /d435i/depth/image/points).
         '/d435i/depth/image/points@sensor_msgs/msg/PointCloud2@gz.msgs.PointCloudPacked',
 
+        # IR stereo pair for stereo-inertial VINS (mimics real D435i infra1/infra2)
+        '/d435i/infra1/image@sensor_msgs/msg/Image@gz.msgs.Image',
+        '/d435i/infra2/image@sensor_msgs/msg/Image@gz.msgs.Image',
+
         '/d435i/imu@sensor_msgs/msg/Imu@gz.msgs.IMU',
     ]
 
@@ -38,6 +42,10 @@ def generate_launch_description():
             # (grid_map/cloud is remapped to drone_0_pcl_render_node/depth/points)
             ('/d435i/depth/image/points', '/drone_0_pcl_render_node/depth/points'),
 
+            # IR stereo pair
+            ('/d435i/infra1/image', '/infra1/image'),
+            ('/d435i/infra2/image', '/infra2/image'),
+
             # IMU
             ('/d435i/imu', '/imu'),
         ],
@@ -46,22 +54,12 @@ def generate_launch_description():
         ],
     )
 
-    # map → odom (static)
-    tf_map_to_odom = Node(
-        package='tf2_ros',
-        executable='static_transform_publisher',
-        name='static_tf_map_to_odom',
-        output='screen',
-        arguments=[
-            '0', '0', '0',
-            '0', '0', '0',
-            'map',
-            'odom',
-        ],
-        parameters=[{'use_sim_time': True}],
-    )
+    # NOTE: map->odom static TF intentionally REMOVED.
+    # The SLAM/odometry source (VINS-Fusion or RTAB-Map) now owns map->odom;
+    # publishing a second static map->odom here corrupts the TF tree.
+    # Re-enable a static identity map->odom ONLY for bridge-only / sensor-test
+    # runs where no SLAM node is providing it.
 
     return LaunchDescription([
         gz_bridge,
-        tf_map_to_odom,
     ])
